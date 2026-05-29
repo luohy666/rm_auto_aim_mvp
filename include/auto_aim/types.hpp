@@ -25,11 +25,11 @@ struct Armor {
 
 // ---------- PnP 解算结果 ----------
 struct PoseResult {
-    cv::Vec3d tvec;          // 相机系下的平移 (x, y, z) mm
+    cv::Vec3d tvec;          // 相机系下的平移 (x, y, z) m
     cv::Vec3d rvec;          // 旋转向量
     double yaw;              // 偏航角 (deg)
     double pitch;            // 俯仰角 (deg)
-    double distance;         // 距离 (mm)
+    double distance;         // 距离 (m)
 };
 
 // ---------- 相机参数 ----------

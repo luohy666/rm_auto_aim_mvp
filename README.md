@@ -17,8 +17,6 @@ A minimal RoboMaster auto-aim vision system based on C++, OpenCV and Eigen.
 - C++17
 - CMake
 - OpenCV
-- Eigen3
-- yaml-cpp
 
 ## Build
 

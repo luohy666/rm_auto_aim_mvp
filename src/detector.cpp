@@ -55,7 +55,7 @@ bool Detector::matchArmor(const Light& a, const Light& b, Armor& armor,
 
     float avgLen = (L.length + R.length) * 0.5f;
     float dx = R.center.x - L.center.x;
-    float dy = R.center.y - L.center.y;        // 带正负号
+    float dy = R.center.y - L.center.y;
     float absDy = std::abs(dy);
 
     if (dx <= 0.f) return false;
@@ -64,11 +64,11 @@ bool Detector::matchArmor(const Light& a, const Light& b, Armor& armor,
     float lenRatio = std::max(L.length, R.length) / std::min(L.length, R.length);
     if (lenRatio > 1.6f) return false;
 
-    // 2. 【加强】角度差：从 12° 收到 8°
+    // 2. 角度差： 8°
     float angleDiff = std::abs(L.angle - R.angle);
     if (angleDiff > 8.f) return false;
 
-    // 3. 【新增】两灯条朝向一致（同号或都接近 0）
+    // 3. 两灯条朝向一致（同号或都接近 0）
     //    避免一个 +10° 一个 -10° 这种"八字形"
     if (L.angle * R.angle < -25.f) return false;   // 异号且乘积绝对值大 → 拒绝
 
@@ -82,7 +82,7 @@ bool Detector::matchArmor(const Light& a, const Light& b, Armor& armor,
     float avgLightAngle = (L.angle + R.angle) * 0.5f;
     if (std::abs(avgLightAngle + lineAngle) > 15.f) return false;
 
-    // 6. 间距比例
+    // 6. 间距比例(水平距离/灯自身长度)
     float xRatio = dx / avgLen;
     if (xRatio < 1.0f || xRatio > 4.5f) return false;
 
@@ -181,17 +181,12 @@ void Detector::draw(cv::Mat& frame, const std::vector<Armor>& armors) {
                      cv::Scalar(0, 0, 255), 2);
         }
 
-        // 2. 画 4 个角点（实心圆 + 编号）
+        // 2. 画 4 个角点
         for (int i = 0; i < 4; ++i) {
             cv::circle(frame, a.pts[i], 5, cornerColors[i], -1);
-            cv::circle(frame, a.pts[i], 6, cv::Scalar(255, 255, 255), 1);  // 白色描边
-            cv::putText(frame, std::to_string(i),
-                        a.pts[i] + cv::Point2f(8, -8),
-                        cv::FONT_HERSHEY_SIMPLEX, 0.5,
-                        cornerColors[i], 1);
         }
 
-        // 3. 画中心点 + "armor" 文字
+        // 3. 画中心点
         cv::circle(frame, a.center, 3, cv::Scalar(0, 0, 255), -1);
     }
 }
