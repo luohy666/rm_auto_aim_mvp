@@ -63,7 +63,7 @@ int main() {
             // ★ 直接用 detector 已经排好序的 4 个角点（左上→左下→右下→右上）
             std::vector<cv::Point2f> image_points(armors[i].pts, armors[i].pts + 4);
 
-            PnPResult r = pnp.solve(image_points, ArmorType::SMALL);
+            PnPResult r = pnp.solve(image_points, auto_aim::ArmorType::SMALL);
             if (!r.success) continue;
 
             // ---------- Camera 坐标系 -> Gimbal / Gun 坐标系 ----------
