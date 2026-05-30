@@ -31,17 +31,15 @@ int main() {
     if (fps <= 0) fps = 30.0;
 
     cv::VideoWriter writer(outVideo.string(),
-        cv::VideoWriter::fourcc('m','p','4','v'), fps, {w, h});
+    cv::VideoWriter::fourcc('m','p','4','v'), fps, {w, h});
 
     // ---------- 3. 检测器 + PnP ----------
     auto_aim::Detector detector;
-    ArmorPnPSolver     pnp;            // 注意：没有 auto_aim:: 命名空间
+    auto_aim::ArmorPnPSolver     pnp;  
 
     // ---------- 3.1 Camera -> Gimbal / Gun 坐标变换 ----------
-    // 这里假设老师给的 “Gimbal 到 Camera 为 2 0 0 0 0 0” 中的 2 表示 2cm
-    // 如果你的单位是米，请把 0.02 改成 2.0
     auto_aim::Transform camera_to_gimbal(
-    auto_aim::Vec3(2.0, 0.0, 0.0),
+    auto_aim::Vec3(0.02, 0.0, 0.0),
     auto_aim::Quaternion::fromEuler(0.0, 0.0, 0.0));
 
 
@@ -63,7 +61,7 @@ int main() {
             // ★ 直接用 detector 已经排好序的 4 个角点（左上→左下→右下→右上）
             std::vector<cv::Point2f> image_points(armors[i].pts, armors[i].pts + 4);
 
-            PnPResult r = pnp.solve(image_points, auto_aim::ArmorType::SMALL);
+            auto_aim::PnPResult r = pnp.solve(image_points, auto_aim::ArmorType::SMALL);
             if (!r.success) continue;
 
             // ---------- Camera 坐标系 -> Gimbal / Gun 坐标系 ----------
