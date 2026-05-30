@@ -1,5 +1,8 @@
 #include "auto_aim/pnp_solver.hpp"
+#include <iostream>
 #include <cmath>
+
+namespace auto_aim {
 
 ArmorPnPSolver::ArmorPnPSolver() {
     // ===== 相机内参 K =====
@@ -49,7 +52,7 @@ PnPResult ArmorPnPSolver::solve(const std::vector<cv::Point2f>& image_points,
     result.success = false;
 
     if (image_points.size() != 4) {
-        std::cerr << "[PnP] image_points 数量必须为 4，当前为 "
+        std::cerr << "[PnP] image_points 数量必须为 4,当前为 "
                   << image_points.size() << std::endl;
         return result;
     }
@@ -60,7 +63,6 @@ PnPResult ArmorPnPSolver::solve(const std::vector<cv::Point2f>& image_points,
                                 : large_armor_points_;
 
     // ===== 调用 solvePnP =====
-    // SOLVEPNP_IPPE 专为共面 4 点设计，速度快、精度高
     bool ok = cv::solvePnP(
         object_points,
         image_points,
@@ -84,27 +86,10 @@ PnPResult ArmorPnPSolver::solve(const std::vector<cv::Point2f>& image_points,
     result.distance = std::sqrt(tx * tx + ty * ty + tz * tz);
 
     // ===== 计算 yaw / pitch（相机坐标系下，对准目标的角度） =====
-    // yaw: 水平偏角 (绕 y 轴)，目标在相机正前方时为 0
-    // pitch: 俯仰角 (绕 x 轴)，向上为正
     result.yaw   = std::atan2(tx, tz) * 180.0 / CV_PI;
     result.pitch = std::atan2(-ty, std::sqrt(tx * tx + tz * tz)) * 180.0 / CV_PI;
 
-    // ===== 从旋转向量提取装甲板自身姿态 (roll) =====
-    cv::Mat R;
-    cv::Rodrigues(result.rvec, R);
-
-    // 欧拉角分解 (ZYX 顺序)
-    double sy = std::sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) +
-                          R.at<double>(1, 0) * R.at<double>(1, 0));
-    bool singular = sy < 1e-6;
-    double roll;
-    if (!singular) {
-        roll = std::atan2(R.at<double>(2, 1), R.at<double>(2, 2));
-    } else {
-        roll = std::atan2(-R.at<double>(1, 2), R.at<double>(1, 1));
-    }
-    result.roll = roll * 180.0 / CV_PI;
-
     result.success = true;
     return result;
+}
 }
